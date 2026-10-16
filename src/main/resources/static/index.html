@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amigo Secreto da Turma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F4EE; --card: #FFFFFF; --ink: #1C2230; --quiet: #5A6170; --line: #DCD8CC;
+    --accent: #3F7A1F; --accent-tint: #E3F0D6; --bad: #B4561A; --bad-tint: #FBEFE4;
+    --dark: #14181F; --dark-card: #1F2530; --on-dark: #E6E9EE;
+    --h: #F2A541; --p: #8BD15A; --s: #7FB7FF;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.5; }
+  main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 56px; display: grid; gap: 20px; }
+  header { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(30px, 6vw, 44px); line-height: 1.05; margin-top: 6px; }
+  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; margin-bottom: 12px; }
+  .who { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--quiet); text-align: right; }
+  .who b { color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; min-width: 0; }
+  .card.dark { background: var(--dark); border-color: var(--dark); color: var(--on-dark); }
+  .card.dark h2 { color: #F6F4EE; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
+  input { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+  input:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  button { font: inherit; font-weight: 600; font-size: 14px; padding: 9px 14px; border-radius: 10px; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.ghost { background: transparent; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .msg { margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px; display: none; overflow-wrap: anywhere; }
+  .msg.ok { display: block; background: var(--accent-tint); color: var(--accent); }
+  .msg.err { display: block; background: var(--bad-tint); color: var(--bad); }
+  .msg code { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .gift { display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 12px; background: var(--accent-tint); margin-top: 12px; }
+  .gift .name { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
+  .gift .wish { color: var(--quiet); }
+  .token { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; overflow-wrap: anywhere; line-height: 1.5; background: var(--dark-card); padding: 12px; border-radius: 10px; }
+  .token .h { color: var(--h); } .token .p { color: var(--p); } .token .s { color: var(--s); }
+  .parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+  .part { background: var(--dark-card); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+  .part small { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; }
+  .part pre { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 6px; color: var(--on-dark); }
+  .exp { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8A93A3; margin-top: 10px; }
+  .muted { color: var(--quiet); font-size: 14px; }
+  .list { list-style: none; padding: 0; margin-top: 10px; display: grid; gap: 2px; }
+  .list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  .list li span:last-child { color: var(--quiet); text-align: right; }
+  .pager { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--quiet); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <p class="eyebrow">Turma FIAP · Spring Security</p>
+      <h1>Amigo Secreto da Turma</h1>
+    </div>
+    <p class="who" id="who">ninguém logado</p>
+  </header>
+
+  <section class="grid" id="auth-area">
+    <div class="card">
+      <h2>Entrar</h2>
+      <form id="login-form">
+        <label for="login-email">E-mail</label>
+        <input id="login-email" type="email" autocomplete="username" required>
+        <label for="login-password">Senha</label>
+        <input id="login-password" type="password" autocomplete="current-password" required>
+        <div class="row">
+          <button class="primary" type="submit">Entrar</button>
+          <button class="ghost" type="button" data-quick="sofia.pereira@turma.fiap.com.br">Sofia (USER)</button>
+          <button class="ghost" type="button" data-quick="admin@fiap.com.br">Professor (ADMIN)</button>
+        </div>
+      </form>
+      <div class="msg" id="login-msg" role="status"></div>
+    </div>
+    <div class="card">
+      <h2>Participar</h2>
+      <form id="register-form">
+        <label for="reg-name">Nome</label>
+        <input id="reg-name" required>
+        <label for="reg-email">E-mail</label>
+        <input id="reg-email" type="email" autocomplete="email" required>
+        <label for="reg-password">Senha</label>
+        <input id="reg-password" type="password" autocomplete="new-password" required>
+        <div class="row"><button class="primary" type="submit">Cadastrar</button></div>
+      </form>
+      <div class="msg" id="reg-msg" role="status"></div>
+    </div>
+  </section>
+
+  <section class="grid hidden" id="app-area">
+    <div class="card">
+      <h2>Quem eu tirei</h2>
+      <p class="muted">Só você vê. O servidor descobre quem você é pelo token, não pela URL.</p>
+      <div class="row">
+        <button class="primary" id="b-mine" type="button">Revelar</button>
+        <button id="b-draw" type="button">Sortear a turma</button>
+        <button class="ghost" id="b-logout" type="button">Sair</button>
+      </div>
+      <div class="gift hidden" id="gift"><span class="muted">Você tirou</span><span class="name" id="gift-name"></span><span class="wish" id="gift-wish"></span></div>
+      <div class="msg" id="app-msg" role="status"></div>
+    </div>
+    <div class="card">
+      <h2>A turma</h2>
+      <form id="search-form" class="row" style="margin-top:0">
+        <input id="search" placeholder="Buscar pelo nome" aria-label="Buscar pelo nome" style="flex:1;min-width:140px">
+        <button type="submit">Buscar</button>
+      </form>
+      <ul class="list" id="people"></ul>
+      <div class="pager"><button class="ghost" id="b-prev" type="button">←</button><span id="page-info"></span><button class="ghost" id="b-next" type="button">→</button></div>
+    </div>
+    <div class="card dark" style="grid-column: 1 / -1">
+      <h2>O seu token</h2>
+      <div class="token" id="token-raw"></div>
+      <div class="parts">
+        <div class="part"><small style="color:var(--h)">HEADER</small><pre id="t-header"></pre></div>
+        <div class="part"><small style="color:var(--p)">PAYLOAD</small><pre id="t-payload"></pre></div>
+        <div class="part"><small style="color:var(--s)">ASSINATURA</small><pre>HMAC-SHA256 com o jwt.secret do servidor. O navegador não consegue conferir nem refazer.</pre></div>
+      </div>
+      <p class="exp" id="t-exp"></p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let token = null, page = 0, query = '';
+  try { token = sessionStorage.getItem('amigo.token'); } catch {}
+
+  const STATUS = {
+    401: 'Não autenticado: faça login de novo.',
+    403: 'Proibido: o seu papel não permite esta ação.',
+    404: 'Não encontrado.',
+    409: 'Esse e-mail já participa.',
+    500: 'Erro no servidor.'
+  };
+  function show(el, kind, text, detail) {
+    const m = $(el); m.className = 'msg ' + kind; m.replaceChildren(document.createTextNode(text));
+    if (detail) { const c = document.createElement('code'); c.textContent = ' ' + detail; m.append(document.createElement('br'), c); }
+  }
+  function decode(part) {
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(atob(b64).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+    return JSON.parse(json);
+  }
+  async function api(path, opts = {}) {
+    const headers = { ...(opts.body ? { 'Content-Type': 'application/json' } : {}) };
+    if (token) headers.Authorization = 'Bearer ' + token;
+    const res = await fetch(path, { ...opts, headers });
+    let body = null;
+    const text = await res.text();
+    try { body = text ? JSON.parse(text) : null; } catch { body = text; }
+    return { res, body };
+  }
+  function errText(res, body) {
+    const detail = body && typeof body === 'object' ? (body.detail || body.message || body.error || '') : '';
+    return [STATUS[res.status] || 'Não deu certo.', `HTTP ${res.status}${detail ? ' · ' + detail : ''}`];
+  }
+
+  function render() {
+    const logged = !!token;
+    $('auth-area').classList.toggle('hidden', logged);
+    $('app-area').classList.toggle('hidden', !logged);
+    if (!logged) { $('who').textContent = 'ninguém logado'; return; }
+    try {
+      const [h, p, s] = token.split('.');
+      const header = decode(h), payload = decode(p);
+      $('who').innerHTML = '';
+      const b = document.createElement('b'); b.textContent = payload.name || payload.sub;
+      $('who').append(b, document.createTextNode(` · ${payload.scope || '—'}`));
+      $('token-raw').innerHTML = '';
+      for (const [cls, txt, dot] of [['h', h, '.'], ['p', p, '.'], ['s', s, '']]) {
+        const span = document.createElement('span'); span.className = cls; span.textContent = txt;
+        $('token-raw').append(span, document.createTextNode(dot));
+      }
+      $('t-header').textContent = JSON.stringify(header, null, 2);
+      $('t-payload').textContent = JSON.stringify(payload, null, 2);
+      tickExp(payload.exp);
+    } catch {
+      $('who').textContent = 'token ilegível';
+    }
+    loadPeople();
+  }
+  let expTimer;
+  function tickExp(exp) {
+    clearInterval(expTimer);
+    const f = () => {
+      const left = exp ? exp - Math.floor(Date.now() / 1000) : NaN;
+      $('t-exp').textContent = isNaN(left) ? '' : left > 0 ? `expira em ${Math.floor(left / 60)} min ${left % 60}s (claim exp)` : 'expirado: faça login de novo';
+    };
+    f(); expTimer = setInterval(f, 1000);
+  }
+  function setToken(t) {
+    token = t;
+    try { t ? sessionStorage.setItem('amigo.token', t) : sessionStorage.removeItem('amigo.token'); } catch {}
+    $('gift').classList.add('hidden'); $('app-msg').className = 'msg';
+    render();
+  }
+
+  $('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const { res, body } = await api('/auth/login', { method: 'POST', body: JSON.stringify({ email: $('login-email').value, password: $('login-password').value }) });
+    if (res.ok && body && body.token) setToken(body.token);
+    else show('login-msg', 'err', ...(res.status === 401 ? ['E-mail ou senha incorretos.', 'HTTP 401'] : errText(res, body)));
+  });
+  document.querySelectorAll('[data-quick]').forEach(b => b.addEventListener('click', () => {
+    $('login-email').value = b.dataset.quick; $('login-password').value = '123456';
+    $('login-form').requestSubmit();
+  }));
+  $('register-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const data = { name: $('reg-name').value, email: $('reg-email').value, password: $('reg-password').value };
+    const { res, body } = await api('/auth/register', { method: 'POST', body: JSON.stringify(data) });
+    if (res.ok) {
+      show('reg-msg', 'ok', 'Cadastro feito. Entrando…');
+      $('login-email').value = data.email; $('login-password').value = data.password;
+      $('login-form').requestSubmit();
+    } else show('reg-msg', 'err', ...(res.status === 500 ? ['Não deu para cadastrar. Esse e-mail já participa?', 'HTTP 500'] : errText(res, body)));
+  });
+  $('b-mine').addEventListener('click', async () => {
+    const { res, body } = await api('/participants/me/draw');
+    if (res.ok) {
+      $('gift-name').textContent = body.name;
+      $('gift-wish').textContent = body.wish ? `Desejo: ${body.wish}` : 'Ainda não escreveu o desejo';
+      $('gift').classList.remove('hidden'); $('app-msg').className = 'msg';
+    } else {
+      $('gift').classList.add('hidden');
+      show('app-msg', 'err', ...(res.status === 404 ? ['O sorteio ainda não foi feito.', 'HTTP 404'] : errText(res, body)));
+      if (res.status === 401) setToken(null);
+    }
+  });
+  $('b-draw').addEventListener('click', async () => {
+    const { res, body } = await api('/participants/draw', { method: 'POST' });
+    if (res.ok) { show('app-msg', 'ok', 'Sorteio feito! Cada pessoa já pode revelar quem tirou.'); $('gift').classList.add('hidden'); }
+    else show('app-msg', 'err', ...errText(res, body));
+  });
+  $('b-logout').addEventListener('click', () => setToken(null));
+
+  async function loadPeople() {
+    const path = query
+      ? `/participants/search?name=${encodeURIComponent(query)}`
+      : `/participants?page=${page}&size=8&sort=name`;
+    const { res, body } = await api(path);
+    const ul = $('people'); ul.replaceChildren();
+    if (!res.ok) { $('page-info').textContent = `HTTP ${res.status}`; if (res.status === 401) setToken(null); return; }
+    const items = Array.isArray(body) ? body : (body.content || []);
+    for (const p of items) {
+      const li = document.createElement('li');
+      const a = document.createElement('span'); a.textContent = p.name;
+      const b = document.createElement('span'); b.textContent = p.wish || 'sem desejo';
+      li.append(a, b); ul.append(li);
+    }
+    const meta = !Array.isArray(body) && body.page;
+    $('page-info').textContent = meta ? `página ${meta.number + 1} de ${meta.totalPages} · ${meta.totalElements} pessoas` : `${items.length} encontradas`;
+    $('b-prev').disabled = !meta || meta.number === 0;
+    $('b-next').disabled = !meta || meta.number + 1 >= meta.totalPages;
+  }
+  $('b-prev').addEventListener('click', () => { page = Math.max(0, page - 1); loadPeople(); });
+  $('b-next').addEventListener('click', () => { page++; loadPeople(); });
+  $('search-form').addEventListener('submit', e => { e.preventDefault(); query = $('search').value.trim(); page = 0; loadPeople(); });
+
+  render();
+</script>
+</body>
+</html>
